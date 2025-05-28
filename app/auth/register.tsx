@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -58,6 +58,7 @@ const RegisterScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ title: "" }} />
       <Text style={styles.title}>Créer un compte</Text>
       <TextInput
         style={styles.input}

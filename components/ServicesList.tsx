@@ -1,45 +1,46 @@
-// components/ServicesList.js
+// components/ServicesList.tsx
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 import ServiceItem from "./ServiceItem";
-import { useRouter } from "expo-router";
 
-// On attend une prop "services" (tableau d'objets service)
-type Service = {
-  id: string | number;
+// Type Service
+type ServiceType = {
+  id: number;
   title: string;
-  subtitle?: string;
-  imageUrl?: string;
-  hasArrow?: boolean;
-  hasCircle?: boolean;
-  onPress?: () => void;
+  subtitle: string;
+  imageUrl: any;
+  hasArrow: boolean;
+  hasCircle: boolean;
+  category: string;
 };
 
+// Ajoute la prop onServicePress
 type ServicesListProps = {
-  services: Service[];
+  services: ServiceType[];
+  onServicePress?: (service: ServiceType) => void;
 };
 
-const ServicesList: React.FC<ServicesListProps> = ({ services }) => {
-  const router = useRouter();
-  return (
-    <View>
-      <Text style={styles.sectionTitle}>Choisissez un Service</Text>
-      <View style={styles.servicesList}>
-        {services.map((service) => (
-          <ServiceItem
-            key={service.id}
-            title={service.title}
-            subtitle={service.subtitle ?? ""}
-            imageUrl={service.imageUrl ?? ""}
-            hasArrow={service.hasArrow}
-            hasCircle={service.hasCircle}
-            onPress={() => router.push({ pathname: "/(tabs)/reservation", params: { serviceTitle: service.title } })}
-          />
-        ))}
-      </View>
+const ServicesList: React.FC<ServicesListProps> = ({
+  services,
+  onServicePress,
+}) => (
+  <View>
+    <Text style={styles.sectionTitle}>Choisissez un Service</Text>
+    <View style={styles.servicesList}>
+      {services.map((service) => (
+        <ServiceItem
+          key={service.id}
+          title={service.title}
+          subtitle={service.subtitle}
+          imageUrl={service.imageUrl}
+          hasArrow={service.hasArrow}
+          hasCircle={service.hasCircle}
+          onPress={() => onServicePress && onServicePress(service)}
+        />
+      ))}
     </View>
-  );
-};
+  </View>
+);
 
 const styles = StyleSheet.create({
   sectionTitle: {

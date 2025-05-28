@@ -1,7 +1,7 @@
 // components/ServiceItem.js
-import { Feather } from '@expo/vector-icons';
-import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Feather } from "@expo/vector-icons";
+import React from "react";
+import { Image, StyleSheet, Text, TouchableOpacity, View, } from "react-native";
 
 interface ServiceItemProps {
   title: string;
@@ -9,26 +9,31 @@ interface ServiceItemProps {
   imageUrl: string;
   hasArrow?: boolean;
   hasCircle?: boolean;
-   onPress?: () => void;
+  onPress?: () => void;
 }
 
-const ServiceItem: React.FC<ServiceItemProps> = ({ title, subtitle, imageUrl, hasArrow, hasCircle, onPress }) => {
+const ServiceItem: React.FC<ServiceItemProps> = ({
+  title,
+  subtitle,
+  imageUrl,
+  hasArrow,
+  hasCircle,
+  onPress,
+}) => {
   return (
     <TouchableOpacity style={styles.serviceItem} onPress={onPress}>
-      <Image 
-        source={{ uri: imageUrl }} 
-        style={styles.serviceImage} 
+      <Image
+        source={typeof imageUrl === "string" ? { uri: imageUrl } : imageUrl}
+        style={styles.serviceImage}
       />
-      
+
       <View style={styles.serviceInfo}>
         <Text style={styles.serviceTitle}>{title}</Text>
         <Text style={styles.serviceSubtitle}>{subtitle}</Text>
       </View>
-      
-      {hasArrow && (
-        <Feather name="chevron-right" size={20} color="#999" />
-      )}
-      
+
+      {hasArrow && <Feather name="chevron-right" size={20} color="#999" />}
+
       {hasCircle && (
         <View style={styles.circleButton}>
           <Feather name="plus" size={18} color="#fff" />
@@ -40,11 +45,11 @@ const ServiceItem: React.FC<ServiceItemProps> = ({ title, subtitle, imageUrl, ha
 
 const styles = StyleSheet.create({
   serviceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: "#f0f0f0",
   },
   serviceImage: {
     width: 50,
@@ -57,21 +62,21 @@ const styles = StyleSheet.create({
   },
   serviceTitle: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   serviceSubtitle: {
     fontSize: 12,
-    color: '#999',
+    color: "#999",
     marginTop: 2,
   },
   circleButton: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#000',
-    justifyContent: 'center',
-    alignItems: 'center',
-  }
+    backgroundColor: "#000",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 });
 
 export default ServiceItem;

@@ -35,6 +35,7 @@ export default function RootLayout() {
     <View style={{ flex: 1 }}>
       <StatusBar style="dark" />
       <Stack>
+        
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="services"

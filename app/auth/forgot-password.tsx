@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useRouter, Stack } from "expo-router";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -18,6 +18,7 @@ const ForgotPasswordScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Stack.Screen options={{ title: "" }} />
       <Text style={styles.title}>Mot de passe oublié</Text>
       <Text style={{ marginBottom: 16, textAlign: "center" }}>
         Entrez votre email pour recevoir un lien de réinitialisation.

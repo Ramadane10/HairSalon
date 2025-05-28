@@ -23,14 +23,8 @@ const TabsLayout = () => {
             ),
           }}
         />
-        <Tabs.Screen
-          name="search"
-          options={{
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="search-outline" size={24} color={color} />
-            ),
-          }}
-        />
+        
+       
         <Tabs.Screen
           name="favoris"
           options={{
@@ -39,14 +33,8 @@ const TabsLayout = () => {
             ),
           }}
         />
-        <Tabs.Screen
-          name="service"
-          options={{
-            tabBarIcon: ({ color }) => (
-              <Ionicons name="cut-outline" size={24} color={color} />
-            ),
-          }}
-        />
+        
+        
         <Tabs.Screen
           name="profile"
           options={{

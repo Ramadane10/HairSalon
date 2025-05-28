@@ -2,6 +2,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import {
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -10,6 +11,7 @@ import {
   View,
 } from "react-native";
 import FilterTab from "../../components/FilterTab";
+import Reservation from "../../components/Reservation"; // adapte le chemin si besoin
 import ServicesList from "../../components/ServicesList";
 import SpecialistSection from "../../components/SpecialistSection";
 
@@ -21,35 +23,45 @@ const allServices = [
     id: 1,
     title: "Coupe homme",
     subtitle: "Rapide et stylée",
-    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    imageUrl: require("../../assets/images/haircut-1.jpg"),
+    hasArrow: true,
+    hasCircle: false,
     category: "Coupes",
   },
   {
     id: 2,
     title: "Soin visage express",
     subtitle: "Rapide et stylée",
-    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    imageUrl: require("../../assets/images/haircut-2.jpg"),
+    hasArrow: true,
+    hasCircle: false,
     category: "Soin du visage",
   },
   {
     id: 3,
     title: "Henné mains",
     subtitle: "Rapide et stylée",
-    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    imageUrl: require("../../assets/images/haircut-1.jpg"),
+    hasArrow: true,
+    hasCircle: false,
     category: "Henné",
   },
   {
     id: 4,
     title: "Massage relaxant",
     subtitle: "Rapide et stylée",
-    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    imageUrl: require("../../assets/images/haircut-1.jpg"),
+    hasArrow: true,
+    hasCircle: false,
     category: "Massage",
   },
   {
     id: 5,
     title: "Coupe enfant",
     subtitle: "Rapide et stylée",
-    imageUrl: "https://images.unsplash.com/photo-1517841905240-472988babdf9",
+    imageUrl: require("../../assets/images/haircut-1.jpg"),
+    hasArrow: true,
+    hasCircle: false,
     category: "Coupes",
   },
   // ...etc.
@@ -59,9 +71,23 @@ type ServicesScreenProps = {
   navigation: StackNavigationProp<any>;
 };
 
+type ServiceType = {
+  id: number;
+  title: string;
+  subtitle: string;
+  imageUrl: any;
+  hasArrow: boolean;
+  hasCircle: boolean;
+  category: string;
+};
+
 const ServicesScreen: React.FC<ServicesScreenProps> = ({ navigation }) => {
   const [activeFilter, setActiveFilter] = useState("Tous");
   const [search, setSearch] = useState("");
+  const [selectedService, setSelectedService] = useState<ServiceType | null>(
+    null
+  );
+  const [showReservation, setShowReservation] = useState(false);
 
   // Filtres en français
   const filters = ["Tous", "Coupes", "Soin du visage", "Henné", "Massage"];
@@ -114,11 +140,31 @@ const ServicesScreen: React.FC<ServicesScreenProps> = ({ navigation }) => {
         ))}
       </ScrollView>
 
+      {/* Liste des spécialistes et services */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <SpecialistSection />
-        {/* Passe la liste filtrée à ServicesList */}
-        <ServicesList services={filteredServices} />
+        <ServicesList
+          services={filteredServices}
+          onServicePress={(service: ServiceType) => {
+            setSelectedService(service);
+            setShowReservation(true);
+          }}
+        />
       </ScrollView>
+
+      {/* Modale de réservation */}
+      <Modal
+        visible={showReservation}
+        animationType="slide"
+        onRequestClose={() => setShowReservation(false)}
+      >
+        {selectedService && (
+          <Reservation
+            service={selectedService}
+            onClose={() => setShowReservation(false)}
+          />
+        )}
+      </Modal>
     </SafeAreaView>
   );
 };

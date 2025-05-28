@@ -1,29 +1,39 @@
-import { Ionicons } from "@expo/vector-icons";
-import { doc, getDoc } from "firebase/firestore";
+import { useRouter } from "expo-router";
+import { signOut } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import MenuItem from "../../components/MenuItem";
 import { auth, db } from "../../config/firebaseConfig";
-
 const ProfileScreen = () => {
+  const router = useRouter();
   const [userData, setUserData] = useState<{
     nom: string;
     prenom: string;
     email: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [editNom, setEditNom] = useState("");
+  const [editPrenom, setEditPrenom] = useState("");
+  const [editEmail, setEditEmail] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      const user = auth.currentUser;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         const userDoc = await getDoc(doc(db, "users", user.uid));
         if (userDoc.exists()) {
@@ -31,9 +41,17 @@ const ProfileScreen = () => {
         }
       }
       setLoading(false);
-    };
-    fetchUserData();
+    });
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (userData) {
+      setEditNom(userData.nom);
+      setEditPrenom(userData.prenom);
+      setEditEmail(userData.email);
+    }
+  }, [userData]);
 
   if (loading) {
     return (
@@ -50,90 +68,247 @@ const ProfileScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* En-tête du profil */}
-        <View style={styles.profileHeader}>
-          <View style={styles.avatarContainer}>
-            <Image
-              source={require("../../assets/images/profile-avatar.jpg")}
-              style={styles.avatar}
+        {editMode ? (
+          <View style={styles.editFormContainer}>
+            <Text style={styles.editFormTitle}>Modifier le profil</Text>
+            <Text style={styles.inputLabel}>Nom</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nom"
+              value={editNom}
+              onChangeText={setEditNom}
             />
+            <Text style={styles.inputLabel}>Prénom</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Prénom"
+              value={editPrenom}
+              onChangeText={setEditPrenom}
+            />
+            <Text style={styles.inputLabel}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={editEmail}
+              onChangeText={setEditEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={async () => {
+                  try {
+                    const user = auth.currentUser;
+                    if (user) {
+                      await setDoc(
+                        doc(db, "users", user.uid),
+                        { nom: editNom, prenom: editPrenom, email: editEmail },
+                        { merge: true }
+                      );
+                      setUserData({
+                        nom: editNom,
+                        prenom: editPrenom,
+                        email: editEmail,
+                      });
+                      setEditMode(false);
+                      Alert.alert("Succès", "Profil mis à jour !");
+                    }
+                  } catch (error: any) {
+                    Alert.alert("Erreur", error.message);
+                  }
+                }}
+              >
+                <Text style={styles.editButtonText}>Enregistrer</Text>
+              </TouchableOpacity>
+              <View style={{ width: 16 }} />
+              <TouchableOpacity
+                style={[styles.editButton, { backgroundColor: "#888" }]}
+                onPress={() => setEditMode(false)}
+              >
+                <Text style={styles.editButtonText}>Annuler</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-          <Text style={styles.userName}>
-            {userData ? `${userData.nom} ${userData.prenom}` : "Nom Prénom"}
-          </Text>
-          <Text style={styles.userEmail}>
-            {userData ? userData.email : "Email"}
-          </Text>
+        ) : (
+          <>
+            {/* En-tête du profil */}
+            <View style={styles.profileHeader}>
+              <View style={styles.avatarContainer}>
+                <Image
+                  source={require("../../assets/images/profile-avatar.jpg")}
+                  style={styles.avatar}
+                />
+              </View>
+              <Text style={styles.userName}>
+                {userData ? `${userData.nom} ${userData.prenom}` : "Nom Prénom"}
+              </Text>
+              <Text style={styles.userEmail}>
+                {userData ? userData.email : "Email"}
+              </Text>
 
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Modifier le profil</Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => {
+                  if (userData) {
+                    setEditNom(userData.nom);
+                    setEditPrenom(userData.prenom);
+                    setEditEmail(userData.email);
+                    setEditMode(true);
+                  }
+                }}
+              >
+                <Text style={styles.editButtonText}>Modifier le profil</Text>
+              </TouchableOpacity>
+            </View>
 
-        {/* Menu du profil */}
-        <View style={styles.menuContainer}>
-          <MenuItem
-            icon="calendar-outline"
-            title="Mes rendez-vous"
-            subtitle="Vos réservations à venir"
-          />
-          <MenuItem
-            icon="cut-outline"
-            title="Mes styles sauvegardés"
-            subtitle="Collection de styles favoris"
-          />
-          <MenuItem
-            icon="card-outline"
-            title="Paiements"
-            subtitle="Gérer vos modes de paiement"
-          />
-          <MenuItem
-            icon="settings-outline"
-            title="Paramètres"
-            subtitle="Préférences et confidentialité"
-          />
-          <MenuItem
-            icon="help-circle-outline"
-            title="Aide"
-            subtitle="Support et FAQ"
-          />
-          <MenuItem
-            icon="log-out-outline"
-            title="Déconnexion"
-            subtitle="Se déconnecter de l'application"
-            isLast
-          />
-        </View>
+            {/* Menu du profil */}
+            <View style={styles.menuContainer}>
+              <MenuItem
+                icon="calendar-outline"
+                title="Mes rendez-vous"
+                subtitle="Vos réservations à venir"
+              />
+              <MenuItem
+                icon="cut-outline"
+                title="Mes styles sauvegardés"
+                subtitle="Collection de styles favoris"
+                onPress={() => router.replace("/(tabs)/favoris")}
+              />
+
+              <MenuItem
+                icon="settings-outline"
+                title="Paramètres"
+                subtitle="Préférences et confidentialité"
+                onPress={() => setShowSettings(true)}
+              />
+              <MenuItem
+                icon="settings-outline"
+                title="A propos "
+                subtitle="Informations sur l'application"
+                onPress={() => setShowAbout(true)}
+              />
+              <MenuItem
+                icon="help-circle-outline"
+                title="Aide"
+                subtitle="Support et FAQ"
+              />
+              <MenuItem
+                icon="log-out-outline"
+                title="Déconnexion"
+                subtitle="Se déconnecter de l'application"
+                isLast
+                onPress={async () => {
+                  try {
+                    await signOut(auth);
+                    // La redirection se fera automatiquement grâce à ton _layout.tsx
+                  } catch (error: any) {
+                    Alert.alert("Erreur", error.message);
+                  }
+                }}
+              />
+            </View>
+          </>
+        )}
       </ScrollView>
+
+      <Modal
+        visible={showSettings}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowSettings(false)}
+      >
+        <SafeAreaView
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#FFF",
+          }}
+        >
+          <Text
+            style={{
+              fontSize: 22,
+              fontWeight: "bold",
+              marginBottom: 16,
+            }}
+          >
+            Paramètres
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#444",
+              marginBottom: 24,
+            }}
+          >
+            Ici tu pourras bientôt gérer tes préférences et ta confidentialité.
+          </Text>
+          <TouchableOpacity
+            style={[styles.editButton, { paddingHorizontal: 32 }]}
+            onPress={() => setShowSettings(false)}
+          >
+            <Text style={styles.editButtonText}>Fermer</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </Modal>
+
+      <Modal
+        visible={showAbout}
+        animationType="slide"
+        transparent={false}
+        onRequestClose={() => setShowAbout(false)}
+      >
+        <SafeAreaView
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#FFF",
+            padding: 24,
+          }}
+        >
+          <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 16 }}>
+            À propos du salon
+          </Text>
+          <Text
+            style={{
+              fontSize: 16,
+              color: "#444",
+              marginBottom: 16,
+              textAlign: "center",
+            }}
+          >
+            Bienvenue chez Cassanova!
+            <br />
+            Notre salon de coiffure vous propose :
+            <br />
+            - Coupes hommes, femmes et enfants
+            <br />
+            - Soin du visage, henné, massages
+            <br />
+            - Réservation en ligne rapide
+            <br />
+            - Gestion de vos favoris et de vos rendez-vous
+            <br />
+            <br />
+            Notre équipe de professionnels vous accueille dans une ambiance
+            chaleureuse pour révéler votre style.
+            <br />
+            <br />
+            Merci de votre confiance !
+          </Text>
+          <TouchableOpacity
+            style={[styles.editButton, { paddingHorizontal: 32 }]}
+            onPress={() => setShowAbout(false)}
+          >
+            <Text style={styles.editButtonText}>Fermer</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </Modal>
     </SafeAreaView>
   );
 };
-
-// Composant d'élément de menu
-const MenuItem = ({
-  icon,
-  title,
-  subtitle,
-  isLast = false,
-}: {
-  icon: keyof typeof Ionicons.glyphMap;
-  title: string;
-  subtitle: string;
-  isLast?: boolean;
-}) => (
-  <TouchableOpacity
-    style={[styles.menuItem, isLast ? styles.lastMenuItem : {}]}
-  >
-    <View style={styles.menuIconContainer}>
-      <Ionicons name={icon} size={22} color="#000000" />
-    </View>
-    <View style={styles.menuTextContainer}>
-      <Text style={styles.menuTitle}>{title}</Text>
-      <Text style={styles.menuSubtitle}>{subtitle}</Text>
-    </View>
-    <Ionicons name="chevron-forward" size={20} color="#888888" />
-  </TouchableOpacity>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -197,37 +372,38 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
-  menuItem: {
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+    width: "90%",
+  },
+  inputLabel: {
+    alignSelf: "flex-start",
+    marginLeft: "5%",
+    marginBottom: 4,
+    fontWeight: "600",
+    color: "#444",
+  },
+  buttonRow: {
     flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
-  },
-  lastMenuItem: {
-    borderBottomWidth: 0,
-  },
-  menuIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#F5F5F5",
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 16,
+    marginTop: 8,
   },
-  menuTextContainer: {
+  editFormContainer: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 60,
   },
-  menuTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  menuSubtitle: {
-    fontSize: 12,
-    color: "#888888",
-    marginTop: 2,
+  editFormTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 24,
+    color: "#222",
   },
 });
 
