@@ -40,6 +40,8 @@ type Service = {
 const FavoritesScreen = () => {
   const [favorites, setFavorites] = useState<any[]>([]);
   const [services, setServices] = useState<Service[]>([]);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   type RootStackParamList = {
     Reservation: {
@@ -70,7 +72,11 @@ const FavoritesScreen = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) fetchFavorites();
+      setCurrentUser(user);
+      if (user) {
+        fetchFavorites();
+      }
+      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -113,21 +119,34 @@ const FavoritesScreen = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={{ textAlign: "center", marginTop: 40 }}>
+          Chargement...
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={{ textAlign: "center", marginTop: 40 }}>
+          Veuillez vous connecter pour voir vos favoris.
+        </Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        {/* <View style={styles.content}>
-          <Ionicons name="heart" size={64} color="#FFB800" />
-          <Text style={styles.title}>Vos favoris</Text>
-          <Text style={styles.description}>
-            Marquez vos salons et styles de coiffure préférés pour un accès
-            rapide.
-          </Text>
-        </View> */}
         <Text style={{ fontSize: 18, fontWeight: "bold", margin: 20 }}>
           Mes favoris
         </Text>
-        {favorites.length === 0 && (
+        {/* Affiche le message "Aucun favori" seulement si le chargement est terminé */}
+        {!loading && favorites.length === 0 && (
           <Text style={{ margin: 16 }}>Aucun favori pour l’instant.</Text>
         )}
         {favorites.map((fav) => (
@@ -161,7 +180,7 @@ const FavoritesScreen = () => {
             </TouchableOpacity>
           </View>
         ))}
-        
+
         {services.map((service) => (
           <View
             key={service.id}

@@ -33,6 +33,14 @@ const TabsLayout = () => {
             ),
           }}
         />
+        <Tabs.Screen
+          name="reservation"
+          options={{
+            tabBarIcon: ({ color }) => (
+              <Ionicons name="calendar-outline" size={24} color={color} />
+            ),
+          }}
+        />
         
         
         <Tabs.Screen

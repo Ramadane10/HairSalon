@@ -164,17 +164,17 @@ const ProfileScreen = () => {
 
             {/* Menu du profil */}
             <View style={styles.menuContainer}>
-              <MenuItem
+              {/* <MenuItem
                 icon="calendar-outline"
                 title="Mes rendez-vous"
                 subtitle="Vos réservations à venir"
-              />
-              <MenuItem
+              /> */}
+              {/* <MenuItem
                 icon="cut-outline"
                 title="Mes styles sauvegardés"
                 subtitle="Collection de styles favoris"
                 onPress={() => router.replace("/(tabs)/favoris")}
-              />
+              /> */}
 
               <MenuItem
                 icon="settings-outline"
@@ -183,7 +183,7 @@ const ProfileScreen = () => {
                 onPress={() => setShowSettings(true)}
               />
               <MenuItem
-                icon="settings-outline"
+                icon="information-circle-outline"
                 title="A propos "
                 subtitle="Informations sur l'application"
                 onPress={() => setShowAbout(true)}

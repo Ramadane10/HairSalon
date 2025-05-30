@@ -5,12 +5,18 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const HeaderBar = () => {
   const router = useRouter();
+  const notificationCount = 6; // ou récupéré dynamiquement
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Cassanova</Text>
-      <TouchableOpacity onPress={() => router.push("/(tabs)/profile")}>
-        <Ionicons name="person-circle-outline" size={32} color="#222" />
+      <TouchableOpacity onPress={() => router.push("/notification")}>
+        <Ionicons name="notifications-circle-outline" size={32} color="#222" />
+        {notificationCount > 0 && (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{notificationCount}</Text>
+          </View>
+        )}
       </TouchableOpacity>
     </View>
   );
@@ -32,6 +38,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#222",
+  },
+  badge: {
+    position: "absolute",
+    right: -6,
+    top: -3,
+    backgroundColor: "red",
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });
 

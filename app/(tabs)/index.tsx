@@ -115,12 +115,12 @@ const ServicesScreen: React.FC<ServicesScreenProps> = ({ navigation }) => {
             onChangeText={setSearch}
           />
         </View>
-        <TouchableOpacity style={styles.filterButton}>
+        {/* <TouchableOpacity style={styles.filterButton}>
           <Ionicons name="options-outline" size={20} color="#000000" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.calendarButton}>
           <Ionicons name="calendar-outline" size={20} color="#000000" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
 
       {/* Filtres de catégorie */}

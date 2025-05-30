@@ -1,12 +1,15 @@
-import { useRouter, Stack } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -20,9 +23,11 @@ const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegister = async () => {
-    console.log("clique");
     if (!nom || !prenom || !email || !password || !confirmPassword) {
       Alert.alert("Erreur", "Tous les champs sont obligatoires.");
       return;
@@ -31,8 +36,8 @@ const RegisterScreen = () => {
       Alert.alert("Erreur", "Les mots de passe ne correspondent pas.");
       return;
     }
+    setLoading(true); // Démarre le loader
     try {
-      // Création du compte utilisateur
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
@@ -40,7 +45,6 @@ const RegisterScreen = () => {
       );
       const user = userCredential.user;
 
-      // Enregistrement des infos dans Firestore
       await setDoc(doc(db, "users", user.uid), {
         nom,
         prenom,
@@ -54,6 +58,7 @@ const RegisterScreen = () => {
       console.log(error);
       Alert.alert("Erreur", error.message);
     }
+    setLoading(false); // Arrête le loader
   };
 
   return (
@@ -80,23 +85,53 @@ const RegisterScreen = () => {
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Mot de passe"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirmer le mot de passe"
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-      />
-      <TouchableOpacity style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>S&apos;inscrire</Text>
-      </TouchableOpacity>
+      <View style={{ position: "relative" }}>
+        <TextInput
+          style={styles.input}
+          placeholder="Mot de passe"
+          secureTextEntry={!showPassword}
+          value={password}
+          onChangeText={setPassword}
+        />
+        <TouchableOpacity
+          style={{ position: "absolute", right: 16, top: 18 }}
+          onPress={() => setShowPassword((v) => !v)}
+        >
+          <Ionicons
+            name={showPassword ? "eye" : "eye-off"} // Affiche l'œil ouvert quand masqué, barré quand visible
+            size={22}
+            color="#888"
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={{ position: "relative" }}>
+        <TextInput
+          style={styles.input}
+          placeholder="Confirmer le mot de passe"
+          secureTextEntry={!showConfirmPassword}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+        />
+        <TouchableOpacity
+          style={{ position: "absolute", right: 16, top: 18 }}
+          onPress={() => setShowConfirmPassword((v) => !v)}
+        >
+          <Ionicons
+            name={showConfirmPassword ? "eye" : "eye-off"}
+            size={22}
+            color="#888"
+          />
+        </TouchableOpacity>
+      </View>
+      {loading ? (
+        <TouchableOpacity style={[styles.button, { opacity: 0.7 }]} disabled>
+          <ActivityIndicator color="#000" />
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
+          <Text style={styles.buttonText}>S&apos;inscrire</Text>
+        </TouchableOpacity>
+      )}
       <TouchableOpacity onPress={() => router.push("/auth/login")}>
         <Text style={styles.link}>Déjà un compte ? Se connecter</Text>
       </TouchableOpacity>

@@ -27,7 +27,7 @@ const MenuItem = ({
       <Text style={styles.menuTitle}>{title}</Text>
       <Text style={styles.menuSubtitle}>{subtitle}</Text>
     </View>
-    <Ionicons name="chevron-forward" size={20} color="#888888" />
+    {/* <Ionicons name="chevron-forward" size={20} color="#888888" /> */}
   </TouchableOpacity>
 );
 
