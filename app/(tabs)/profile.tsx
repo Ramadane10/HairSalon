@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import { signOut } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -226,6 +227,13 @@ const ProfileScreen = () => {
             backgroundColor: "#FFF",
           }}
         >
+          {/* Icône retour en haut à gauche */}
+          <TouchableOpacity
+            onPress={() => setShowSettings(false)}
+            style={{ position: "absolute", top: 20, left: 16, zIndex: 10 }}
+          >
+            <Ionicons name="arrow-back" size={28} color="#222" />
+          </TouchableOpacity>
           <Text
             style={{
               fontSize: 22,
@@ -244,12 +252,7 @@ const ProfileScreen = () => {
           >
             Ici tu pourras bientôt gérer tes préférences et ta confidentialité.
           </Text>
-          <TouchableOpacity
-            style={[styles.editButton, { paddingHorizontal: 32 }]}
-            onPress={() => setShowSettings(false)}
-          >
-            <Text style={styles.editButtonText}>Fermer</Text>
-          </TouchableOpacity>
+          
         </SafeAreaView>
       </Modal>
 
@@ -268,42 +271,43 @@ const ProfileScreen = () => {
             padding: 24,
           }}
         >
+          {/* Icône retour en haut à gauche */}
+          <TouchableOpacity
+            onPress={() => setShowAbout(false)}
+            style={{ position: "absolute", top: 20, left: 16, zIndex: 10 }}
+          >
+            <Ionicons name="arrow-back" size={28} color="#222" />
+          </TouchableOpacity>
           <Text style={{ fontSize: 22, fontWeight: "bold", marginBottom: 16 }}>
             À propos du salon
           </Text>
           <Text
-            style={{
-              fontSize: 16,
-              color: "#444",
-              marginBottom: 16,
-              textAlign: "center",
-            }}
-          >
-            Bienvenue chez Cassanova!
-            <br />
-            Notre salon de coiffure vous propose :
-            <br />
-            - Coupes hommes, femmes et enfants
-            <br />
-            - Soin du visage, henné, massages
-            <br />
-            - Réservation en ligne rapide
-            <br />
-            - Gestion de vos favoris et de vos rendez-vous
-            <br />
-            <br />
-            Notre équipe de professionnels vous accueille dans une ambiance
-            chaleureuse pour révéler votre style.
-            <br />
-            <br />
-            Merci de votre confiance !
-          </Text>
-          <TouchableOpacity
-            style={[styles.editButton, { paddingHorizontal: 32 }]}
-            onPress={() => setShowAbout(false)}
-          >
-            <Text style={styles.editButtonText}>Fermer</Text>
-          </TouchableOpacity>
+              style={{
+                fontSize: 16,
+                color: "#444",
+                marginBottom: 16,
+                textAlign: "center",
+                lineHeight: 24,
+              }}
+            >
+              Bienvenue chez Cassanova !{"\n\n"}
+              Notre salon de coiffure vous propose :
+              {"\n"}• Coupes hommes, femmes et enfants
+              {"\n"}• Soin du visage, henné, massages
+              {"\n"}• Réservation en ligne rapide
+              {"\n"}• Gestion de vos favoris et de vos rendez-vous
+              {"\n\n"}
+              Notre équipe de professionnels vous accueille dans une ambiance chaleureuse pour révéler votre style.
+              {"\n\n"}
+              Merci de votre confiance !
+              {"\n\n"}
+              <Text style={{ fontWeight: "bold" }}>Adresse :</Text> Nongo, Taady, Résidence KPC.
+              {"\n\n"}
+              <Text style={{ fontWeight: "bold" }}>Pour le SPA :</Text> 627 48 84 84
+              {"\n"}
+              <Text style={{ fontWeight: "bold" }}>Pour le Salon :</Text> 624 77 77 78
+            </Text>
+          
         </SafeAreaView>
       </Modal>
     </SafeAreaView>

@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Image,
   SafeAreaView,
   ScrollView,
@@ -56,8 +57,13 @@ const FavoritesScreen = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const fetchFavorites = async () => {
+    setLoading(true); // Ajoute ceci pour afficher le spinner à chaque chargement
     const user = auth.currentUser;
-    if (!user) return;
+    if (!user) {
+      setFavorites([]);
+      setLoading(false);
+      return;
+    }
     const q = query(
       collection(db, "favorites"),
       where("userId", "==", user.uid)
@@ -68,6 +74,7 @@ const FavoritesScreen = () => {
       ...doc.data(),
     }));
     setFavorites(favs);
+    setLoading(false); // Termine le chargement ici
   };
 
   useEffect(() => {
@@ -75,8 +82,9 @@ const FavoritesScreen = () => {
       setCurrentUser(user);
       if (user) {
         fetchFavorites();
+      } else {
+        setLoading(false);
       }
-      setLoading(false);
     });
     return () => unsubscribe();
   }, []);
@@ -122,9 +130,11 @@ const FavoritesScreen = () => {
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text style={{ textAlign: "center", marginTop: 40 }}>
-          Chargement...
-        </Text>
+        <ActivityIndicator
+          size="large"
+          color="#FFD166"
+          style={{ marginTop: 40 }}
+        />
       </SafeAreaView>
     );
   }

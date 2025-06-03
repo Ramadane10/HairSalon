@@ -13,7 +13,7 @@ const specialistsData = [
 const SpecialistSection = () => {
   return (
     <View>
-      <Text style={styles.sectionTitle}>Choisissez un spécialiste</Text>
+      <Text style={styles.sectionTitle}>Nos spécialistes</Text>
       
       <ScrollView 
         horizontal 

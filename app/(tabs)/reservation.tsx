@@ -104,46 +104,107 @@ export default function ReservationListScreen() {
         ) : sortedReservations.length === 0 ? (
           <Text style={styles.empty}>Aucune réservation trouvée.</Text>
         ) : (
-          sortedReservations.map((res) => (
-            <View key={res.id} style={styles.card}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={styles.title}>{res.service}</Text>
-                <Ionicons
-                  name="trash-outline"
-                  size={22}
-                  color="#FF3B30"
-                  style={{ marginLeft: 8 }}
-                  onPress={() =>
-                    Alert.alert(
-                      "Supprimer",
-                      "Voulez-vous vraiment supprimer cette réservation ?",
-                      [
-                        { text: "Annuler", style: "cancel" },
-                        {
-                          text: "Supprimer",
-                          style: "destructive",
-                          onPress: () => handleDelete(res.id),
-                        },
-                      ]
-                    )
-                  }
-                />
+          sortedReservations.map((res) => {
+            const now = new Date();
+            const resDate = res.date?.toDate
+              ? res.date.toDate()
+              : new Date(res.date);
+            const isPast = resDate < now;
+
+            return (
+              <View key={res.id} style={styles.card}>
+                {/* Ligne titre + badge */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text style={styles.title}>{res.service}</Text>
+                  <Text
+                    style={{
+                      color: isPast ? "#FF3B30" : "#27ae60",
+                      fontWeight: "bold",
+                      fontSize: 13,
+                      backgroundColor: isPast ? "#fdecea" : "#eafaf1",
+                      paddingHorizontal: 10,
+                      paddingVertical: 4,
+                      borderRadius: 8,
+                      marginLeft: 8,
+                    }}
+                  >
+                    {isPast ? "Passée" : "À venir"}
+                  </Text>
+                </View>
+                {/* Coiffeur */}
+                <Text>Coiffeur : {res.barberName}</Text>
+                {/* Ligne date + poubelle */}
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Text>
+                    Date :{" "}
+                    {res.date?.toDate
+                      ? res.date.toDate().toLocaleString()
+                      : String(res.date)}
+                  </Text>
+                  {isPast ? (
+                    <Ionicons
+                      name="trash-outline"
+                      size={18}
+                      color="#FF3B30"
+                      onPress={() =>
+                        Alert.alert(
+                          "Supprimer",
+                          "Voulez-vous vraiment supprimer cette réservation ?",
+                          [
+                            { text: "Annuler", style: "cancel" },
+                            {
+                              text: "Supprimer",
+                              style: "destructive",
+                              onPress: () => handleDelete(res.id),
+                            },
+                          ]
+                        )
+                      }
+                    />
+                  ) : (
+                    <Text
+                      style={{
+                        color: "#FF3B30",
+                        fontWeight: "bold",
+                        paddingHorizontal: 10,
+                        paddingVertical: 4,
+                        borderRadius: 8,
+                        backgroundColor: "#fdecea",
+                      }}
+                      onPress={() =>
+                        Alert.alert(
+                          "Annuler",
+                          "Voulez-vous vraiment annuler cette réservation ?",
+                          [
+                            { text: "Non", style: "cancel" },
+                            {
+                              text: "Oui",
+                              style: "destructive",
+                              onPress: () => handleDelete(res.id),
+                            },
+                          ]
+                        )
+                      }
+                    >
+                      Annuler
+                    </Text>
+                  )}
+                </View>
               </View>
-              <Text>Coiffeur : {res.barberName}</Text>
-              <Text>
-                Date :{" "}
-                {res.date?.toDate
-                  ? res.date.toDate().toLocaleString()
-                  : String(res.date)}
-              </Text>
-            </View>
-          ))
+            );
+          })
         )}
       </ScrollView>
     </SafeAreaView>

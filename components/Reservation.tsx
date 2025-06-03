@@ -8,9 +8,11 @@ import {
   doc,
   getDoc,
   setDoc,
+  Timestamp,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   Image,
   SafeAreaView,
@@ -81,6 +83,7 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isFavorite, setIsFavorite] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   interface DateTimePickerEvent {
     type: string;
@@ -127,18 +130,22 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
       Alert.alert("Erreur", "Veuillez sélectionner une date et une heure.");
       return;
     }
+    setLoading(true); // Affiche le spinner
     try {
       await addDoc(collection(db, "reservations"), {
         userId: user.uid,
         barberId: selectedBarber.id,
         barberName: selectedBarber.name,
         service: serviceTitle,
-        date: selectedDate, // <-- stocke l'objet Date
-        createdAt: new Date(),
+        date: Timestamp.fromDate(selectedDate),
+        createdAt: Timestamp.fromDate(new Date()),
       });
+      setLoading(false); // Cache le spinner
       Alert.alert("Succès", "Réservation enregistrée !");
-      router.replace("/(tabs)/profile");
+      onClose();
+      router.replace("/(tabs)"); // Redirige vers l'accueil
     } catch (error: any) {
+      setLoading(false); // Cache le spinner même en cas d'erreur
       Alert.alert("Erreur", error.message);
     }
   };
@@ -182,6 +189,8 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
     };
     checkFavorite();
   }, [serviceId]);
+
+  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -342,18 +351,23 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
                 padding: 14,
                 alignItems: "center",
                 marginTop: 16,
+                opacity: loading ? 0.7 : 1,
+                flexDirection: "row",
+                justifyContent: "center",
               }}
               onPress={() => setBookingStep(1)}
+              disabled={loading}
             >
-              <Text
-                style={{
-                  color: "#000",
-                  fontWeight: "bold",
-                  fontSize: 16,
-                }}
-              >
-                Confirmer
-              </Text>
+                <Text
+                  style={{
+                    color: "#000",
+                    fontWeight: "bold",
+                    fontSize: 16,
+                  }}
+                >
+                  Confirmation
+                </Text>
+             
             </TouchableOpacity>
           </>
         ) : (
@@ -380,18 +394,34 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
                 padding: 14,
                 alignItems: "center",
                 marginTop: 16,
+                opacity: loading ? 0.7 : 1,
+                flexDirection: "row",
+                justifyContent: "center",
               }}
               onPress={handleReserve}
+              disabled={loading}
             >
-              <Text
-                style={{
-                  color: "#000",
-                  fontWeight: "bold",
-                  fontSize: 16,
-                }}
-              >
-                Réserver
-              </Text>
+              {loading ? (
+                <>
+                  <ActivityIndicator size="small" color="#000" />
+                  <Text
+                    style={{
+                      color: "#000",
+                      fontWeight: "bold",
+                      fontSize: 16,
+                      marginLeft: 10,
+                    }}
+                  >
+                    Réservation...
+                  </Text>
+                </>
+              ) : (
+                <Text
+                  style={{ color: "#000", fontWeight: "bold", fontSize: 16 }}
+                >
+                  Réserver
+                </Text>
+              )}
             </TouchableOpacity>
           </View>
         )}
