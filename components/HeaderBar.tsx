@@ -1,6 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 const HeaderBar = () => {
@@ -9,7 +8,7 @@ const HeaderBar = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Cassanova</Text>
+      <Text style={styles.title}>CASA NOVA</Text>
       <TouchableOpacity onPress={() => router.push("/notification")}>
         <Ionicons name="notifications-circle-outline" size={32} color="#222" />
         {notificationCount > 0 && (

@@ -1,4 +1,4 @@
-import { useRouter, Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -9,8 +9,8 @@ import {
 } from "react-native";
 
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../../config/firebaseConfig"; // adapte le chemin si besoin
 import { Alert } from "react-native";
+import { auth } from "../../config/firebaseConfig"; // adapte le chemin si besoin
 
 const ForgotPasswordScreen = () => {
   const router = useRouter();

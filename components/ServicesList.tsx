@@ -1,6 +1,6 @@
 // components/ServicesList.tsx
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import ServiceItem from "./ServiceItem";
 
 // Type Service
@@ -8,39 +8,40 @@ type ServiceType = {
   id: number;
   title: string;
   subtitle: string;
-  imageUrl: any;
+  imageUrl: string | number;
   hasArrow: boolean;
   hasCircle: boolean;
   category: string;
 };
 
-// Ajoute la prop onServicePress
 type ServicesListProps = {
   services: ServiceType[];
   onServicePress?: (service: ServiceType) => void;
 };
 
-const ServicesList: React.FC<ServicesListProps> = ({
-  services,
-  onServicePress,
-}) => (
+const ServicesList: React.FC<ServicesListProps> = React.memo(({ services, onServicePress }) => (
   <View>
     <Text style={styles.sectionTitle}>Choisissez un Service</Text>
-    <View style={styles.servicesList}>
-      {services.map((service) => (
+    <FlatList
+      data={services}
+      keyExtractor={(item) => item.id.toString()}
+      renderItem={({ item }) => (
         <ServiceItem
-          key={service.id}
-          title={service.title}
-          subtitle={service.subtitle}
-          imageUrl={service.imageUrl}
-          hasArrow={service.hasArrow}
-          hasCircle={service.hasCircle}
-          onPress={() => onServicePress && onServicePress(service)}
+          key={item.id}
+          title={item.title}
+          subtitle={item.subtitle}
+          imageUrl={item.imageUrl}
+          hasArrow={item.hasArrow}
+          hasCircle={item.hasCircle}
+          onPress={() => onServicePress && onServicePress(item)}
         />
-      ))}
-    </View>
+      )}
+      contentContainerStyle={styles.servicesList}
+      showsVerticalScrollIndicator={false}
+      ItemSeparatorComponent={() => <View style={{ height: 4 }} />}
+    />
   </View>
-);
+));
 
 const styles = StyleSheet.create({
   sectionTitle: {
@@ -51,8 +52,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   servicesList: {
-    marginTop: 8,
     paddingHorizontal: 16,
+    paddingBottom: 16,
   },
 });
 

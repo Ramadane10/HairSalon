@@ -1,8 +1,8 @@
 import React from 'react';
-import { 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet 
+import {
+  StyleSheet,
+  Text,
+  TouchableOpacity
 } from 'react-native';
 
 interface FilterTabProps {

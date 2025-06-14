@@ -80,6 +80,7 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
   type Barber = { id: number; name: string; experience: string; image: string };
   const [selectedBarber, setSelectedBarber] = useState<Barber | null>(null);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [pickerMode, setPickerMode] = useState<"date" | "time">("date");
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isFavorite, setIsFavorite] = useState(false);
@@ -139,6 +140,7 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
         service: serviceTitle,
         date: Timestamp.fromDate(selectedDate),
         createdAt: Timestamp.fromDate(new Date()),
+        confirmed: false, // <-- AJOUTE CE CHAMP
       });
       setLoading(false); // Cache le spinner
       Alert.alert("Succès", "Réservation enregistrée !");
@@ -189,8 +191,6 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
     };
     checkFavorite();
   }, [serviceId]);
-
-  
 
   return (
     <SafeAreaView style={styles.container}>
@@ -297,15 +297,15 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
             {/* Sélection date et heure */}
             <Text style={styles.sectionLabel}>Date & Heure</Text>
             <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                marginBottom: 16,
-              }}
+              style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}
             >
               <TouchableOpacity
                 style={[styles.timeSlot, { flex: 1 }]}
-                onPress={() => setShowDatePicker(true)}
+                onPress={() => {
+                  setShowDatePicker(true);
+                  setPickerMode("date");
+                }}
+                accessibilityLabel="Choisir la date"
               >
                 <Ionicons name="calendar-outline" size={18} color="#FFD166" />
                 <Text style={{ marginLeft: 8 }}>
@@ -314,7 +314,11 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.timeSlot, { flex: 1, marginLeft: 12 }]}
-                onPress={() => setShowTimePicker(true)}
+                onPress={() => {
+                  setShowDatePicker(true);
+                  setPickerMode("time");
+                }}
+                accessibilityLabel="Choisir l'heure"
               >
                 <Ionicons name="time-outline" size={18} color="#FFD166" />
                 <Text style={{ marginLeft: 8 }}>
@@ -329,17 +333,26 @@ const Reservation: React.FC<ReservationProps> = ({ service, onClose }) => {
             {showDatePicker && (
               <DateTimePicker
                 value={selectedDate}
-                mode="date"
+                mode={pickerMode}
                 display="default"
-                onChange={handleDateChange}
-              />
-            )}
-            {showTimePicker && (
-              <DateTimePicker
-                value={selectedDate}
-                mode="time"
-                display="default"
-                onChange={handleTimeChange}
+                onChange={(event, date) => {
+                  setShowDatePicker(false);
+                  if (date) {
+                    if (pickerMode === "date") {
+                      // On garde l'heure précédente
+                      const newDate = new Date(date);
+                      newDate.setHours(selectedDate.getHours());
+                      newDate.setMinutes(selectedDate.getMinutes());
+                      setSelectedDate(newDate);
+                    } else {
+                      // On garde la date précédente
+                      const newDate = new Date(selectedDate);
+                      newDate.setHours(date.getHours());
+                      newDate.setMinutes(date.getMinutes());
+                      setSelectedDate(newDate);
+                    }
+                  }
+                }}
               />
             )}
 
